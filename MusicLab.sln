@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32421.90
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MusicLab.Backend", "MusicLab.Backend\MusicLab.Backend.csproj", "{F984282D-50E8-4756-AC02-A35F11523EE2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MusicLab.Frontend", "MusicLab.Frontend\MusicLab.Frontend.csproj", "{A179F4E1-23C2-4A76-9BC4-C8E28E11DE65}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MusicLab.Repository", "MusicLab.Repository\MusicLab.Repository.csproj", "{2F2A58AA-1031-4642-B7C3-454841C6806A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F984282D-50E8-4756-AC02-A35F11523EE2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F984282D-50E8-4756-AC02-A35F11523EE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F984282D-50E8-4756-AC02-A35F11523EE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F984282D-50E8-4756-AC02-A35F11523EE2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A179F4E1-23C2-4A76-9BC4-C8E28E11DE65}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A179F4E1-23C2-4A76-9BC4-C8E28E11DE65}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A179F4E1-23C2-4A76-9BC4-C8E28E11DE65}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A179F4E1-23C2-4A76-9BC4-C8E28E11DE65}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F2A58AA-1031-4642-B7C3-454841C6806A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F2A58AA-1031-4642-B7C3-454841C6806A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F2A58AA-1031-4642-B7C3-454841C6806A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F2A58AA-1031-4642-B7C3-454841C6806A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4ABBD0CD-BA93-485C-8F09-09ECAFF73CE8}
+	EndGlobalSection
+EndGlobal

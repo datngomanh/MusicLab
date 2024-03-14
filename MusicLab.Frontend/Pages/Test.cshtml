@@ -1,0 +1,56 @@
+﻿@page
+@model MusicLab.Frontend.Pages.TestModel
+@{
+    Layout = "_LayoutLogin";
+    ViewData["Title"] = "Test";
+}
+<!-- Include the jQuery library -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- HTML element to hold the loaded page content -->
+<div id="content"></div>
+
+<!-- Your audio element -->
+<audio id="myAudio" controls>
+    <source src="img/songs/test.mp3" type="audio/mp3">
+    Your browser does not support the audio element.
+</audio>
+
+<!-- Navigation links -->
+<a href="/Search" class="nav-link">Page 1</a>
+<a href="/Home" class="nav-link">Page 2</a>
+<p>fdgdgfd</p>
+<!-- Add more navigation links as needed -->
+<script>
+    // Store the audio element in a variable
+var audio = document.getElementById("myAudio");
+var audioPosition = 0; // Variable to store the audio playback position
+
+// Function to load new page content using AJAX
+function loadPage(url) {
+  // Pause the audio and store the current playback position
+  audio.pause();
+  audioPosition = audio.currentTime;
+
+  // Use AJAX to load the new page content
+  $.ajax({
+    url: url,
+    success: function (data) {
+      // Update the page content
+      $("#content").html(data);
+
+      // Restore the audio playback position and resume playing
+      audio.currentTime = audioPosition;
+      audio.play();
+    }
+  });
+}
+
+// Attach click event handlers to your navigation links
+$(".nav-link").click(function (e) {
+  e.preventDefault(); // Prevent the default link behavior
+  var url = $(this).attr("href"); // Get the URL from the clicked link
+  loadPage(url);
+});
+
+</script>

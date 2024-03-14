@@ -1,0 +1,88 @@
+﻿@page
+@model MusicLab.Frontend.Pages.PlaylistModel
+@{
+    Layout = "_LayoutHome";
+    ViewData["Title"] = "Playlist";
+}
+<div class="margin-top"></div>
+<div class="main-container">
+    <div class="row list mb-5 position-relative">
+        <img src="~/img/cds/music-default.jpg" class="img-cover-playlist rounded-top" />
+
+        <div class="position-absolute top-50 start-50 translate-middle d-flex" style="padding: 70px 0 0 70px;">
+            <img src="~/img/cds/music-default.jpg" class="album-cover rounded d-inline-flex" />
+            <div class="d-flex flex-column ms-4 justify-content-center align-content-center">
+                <span class="fs-5 text-white">Playlist</span>
+                <h1 class="text-white fw-bold font-monospace fs-1" style="font-size: 150px;">@Model.playlist.Title</h1>
+                <span class="fs-3 text-white">
+                    @Model.playlist.Username
+                    <i class="fa-solid fa-circle align-content-center" style="font-size: 5px;"></i>
+                    @Model.playlist.PlaylistSongs.Count() Songs
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="mb-5 d-flex">
+        <div class="btn-play-artist d-inline-flex" id="@Model.playlist.Id">
+            <button class="play-music-playlist-btn d-flex justify-content-center align-items-center">
+                <i class="fas fa-play fs-4"></i>
+            </button>
+        </div>
+    </div>
+    <div class="row list mb-5">
+        <div class="col-12">
+            <h2 class="title mb-3">Songs</h2>
+            @foreach (var item in Model.Songs)
+            {
+                <div class="search-song-hover d-flex p-2" id="@item.Id">
+                    <div class="play-music-btn-artist search-btnPlay position-relative">
+                        <img src="@item.Image" class="searched-song d-inline my-auto rounded">
+                        <div class="search-btnPlay-song position-absolute top-50 start-50 translate-middle">
+                            <i class="fa-solid fa-play text-white"></i>
+                        </div>
+                    </div>
+                    <div class="d-inline-block ms-4 text-white-50">
+                        <b class="fs-5 text-white">@item.Title</b><br />
+                        <span>
+                            @foreach (var artist in item.SongArtists)
+                            {
+                                if (artist.ArtistId != item.SongArtists.LastOrDefault().ArtistId)
+                                {
+                                    artist.Artist.Name += ", ";
+                                }
+                                @artist.Artist.Name
+                            }
+                        </span>
+                    </div>
+                    <span class="search-favorite ms-auto me-5 align-content-center text-white-50" id="@Model.playlist.Id">
+                        <span style="margin-right:300px;"> @string.Format("{0:0,0,0}", @item.NumberOfListen)</span>
+                        @if (string.IsNullOrEmpty(HttpContext.Session.GetString("User")))
+                        {
+                            <a href="#" data-bs-toggle="modal" data-bs-target="#LoginModal">
+                                <i class="search-favorite-song fa-regular fa-heart me-5 text-white-50"></i>
+                            </a>
+                        }
+                        else
+                        {
+                            var isLike = 0;
+                            foreach (var favor in Model.FavoriteSongs)
+                            {
+                                if (item.Id == favor.Id)
+                                {
+                                    <i class="del-favorite-song-playlist fa-solid fa-heart me-5 text-success" id="@item.Id"></i>
+                                    isLike++;
+                                    break;
+                                }
+                            }
+                            if (isLike == 0)
+                            {
+                                <i class="search-favorite-song add-favorite-song-playlist fa-regular fa-heart me-5" id="@item.Id"></i>
+                            }
+                        }
+                        @Model.GetFormattedTime(item.Duration)
+                    </span>
+                </div>
+            }
+        </div>
+    </div>
+</div>

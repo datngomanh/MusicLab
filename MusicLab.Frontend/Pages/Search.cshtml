@@ -1,0 +1,32 @@
+﻿@page
+@model MusicLab.Frontend.Pages.SearchModel
+@{
+    Layout = "_LayoutHome";
+    ViewData["Title"] = "Search";
+}
+<div class="margin-top"></div>
+<div class="main-container">
+    <div class="category-all-search row list">
+        <h2 class="title mb-3">Categories All</h2>
+        @foreach (var item in Model.ListCategories)
+        {
+            <div class="col-12 col-md-3 col-lg-2">
+                <div class="card p-0 mb-2">
+                    <a href="/Category?categoryId=@item.Id" class="nav-link-category position-relative">
+                        <img src="@item.Image" class="card-img-top rounded" />
+                        <h3 class="position-absolute top-0 start-0 ms-2 mt-2 text-white">@item.Name</h3>
+                    </a>
+                </div>
+            </div>
+        }
+    </div> 
+</div>
+
+<script src="~/js/SearchKeyword.js" asp-append-version="true"></script>
+<script>
+    $(".nav-link-category").click(function (e) {
+        e.preventDefault();
+        var url = $(this).attr("href");
+        loadPage(url);
+    });
+</script>

@@ -1,0 +1,437 @@
+﻿@page
+@using System.Text.Json
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using MusicLab.Repository.Models;
+@model MusicLab.Frontend.Pages.HomeModel
+@{
+    Layout = "_LayoutHome";
+    ViewData["Title"] = "Home";
+}
+<div class="root" id="root">
+    <nav class="nav-bar d-flex flex-column">
+        <a href="/Topic" class="nav-link">
+            <div class="nav-bar-header d-flex ps-4 pt-4 pb-4">
+                <img class="logo ms-3" src="img/logo.png" />
+            </div>
+        </a>
+        <ul class="navbar-nav" id="navbar-link">
+            <li class="nav-item active" id="nav-item-home">
+                <a href="/Topic" class="nav-link d-flex align-items-center">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
+            </li>
+            <li class="nav-item" id="nav-item-search">
+                <a href="/Search" class="nav-link d-flex align-items-center">
+                    <i class="fas fa-search"></i>
+                    <span>Search</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="root-list d-flex flex-column mt-4">
+            <div class="root-list-header d-flex">
+                <h2>Library</h2>
+                <h2 class="add-playlist" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Create new playlist">
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#LoginModal">
+                        <i class="fas fa-plus text-white"></i>
+                    </a>
+                </h2>
+            </div>
+
+            <div class="root-list-body">
+                <div class="root-list-body-header">
+                    <span>Playlist</span>
+                </div>
+                @if (string.IsNullOrEmpty(HttpContext.Session.GetString("User")))
+                {
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#LoginModal">
+                        <div class="root-list-item d-flex">
+                            <div class="root-list-icon d-flex justify-content-center align-items-center">
+                                <i class="fas fa-plus text-dark"></i>
+                            </div>
+                            <span>Add Playlist</span>
+                        </div>
+                    </a>
+                }
+                else
+                {
+                    var token = HttpContext.Session.GetString("JwtToken");
+                    var username = JsonSerializer.Deserialize<User>(HttpContext.Session.GetString("User")).Username;
+                    <input class="jwt-token" type="text" value="@token" hidden />
+                    <input class="username-logged" type="text" value="@username" hidden />
+                    <div class="root-list-item d-flex my-2" id="search-library">
+                        <div class="search d-flex justify-content-center align-items-center" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Search in Library">
+                            <i class="fa-solid fa-magnifying-glass text-secondary-emphasis"></i>
+                        </div>
+                        <input id="search-input" type="text" class="form-control border-black bg-black text-white" placeholder="Search in library">
+                    </div>
+                    <div class="root-list-item d-flex opacity-100">
+                        <div class="root-list-icon heart d-flex justify-content-center align-items-center">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <span>
+                            <a href="/Favorite" class="nav-link-playlist text-white">
+                                <span>Liked Songs</span><br />
+                                <i class="fa-solid fa-thumbtack text-success fa-rotate-by" style="--fa-rotate-angle: 45deg;"></i>
+                                <span class="fw-light ms-1" style="font-size: 12px;">Playlists</span>
+                                <span class="m-1"><i class="fa-solid fa-circle align-content-center" style="font-size: 5px;"></i></span>
+                                <span class="fw-light number-favor-songs" id="@Model.ListFavoriteSongs.Count()" style="font-size: 12px;">@Model.ListFavoriteSongs.Count() Songs</span>
+                            </a>
+                        </span>
+                    </div>
+                    <div id="search-playlist">
+                        @foreach (var item in Model.ListPlaylists)
+                        {
+                            <a href="/Playlist?playlistId=@item.Id" class="nav-link-playlist">
+                                <div class="root-list-item d-flex">
+                                    <div class="root-list-icon d-flex justify-content-center align-items-center bg-secondary">
+                                        <i class="fa-solid fa-music"></i>
+                                    </div>
+                                    <span>
+                                        <span>@item.Title</span><br />
+                                        <span class="fw-light ms-1" style="font-size: 12px;">Playlists</span>
+                                        <span class="m-1"><i class="fa-solid fa-circle align-content-center" style="font-size: 5px;"></i></span>
+                                        <span class="fw-light" style="font-size: 12px;">@item.Username</span>
+                                    </span>
+                                </div>
+                            </a>
+                        }
+                    </div>
+
+                }
+
+            </div>
+        </div>
+    </nav>
+    <div class="top-bar">
+        <header id="header" class="d-flex position-relative">
+            <div id="header-overlay"></div>
+            <div class="icons-action-left d-flex my-auto">
+                <button class="d-flex justify-content-center align-items-center">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+
+                <button class="d-flex justify-content-center align-items-center ms-3">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+
+            <div class="ms-4 d-flex bg-dark rounded-pill w-25" id="search-top-bar">
+                <div class="d-flex justify-content-center align-items-center p-3">
+                    <i class="fa-solid fa-magnifying-glass text-white"></i>
+                </div>
+                <input id="search-all" type="text" class="form-control border-black bg-dark bg-opacity-50 text-white rounded-pill" placeholder="What do you want to listen?">
+            </div>
+
+            <div class="d-flex ms-auto my-auto">
+                @if (string.IsNullOrEmpty(HttpContext.Session.GetString("User")))
+                {
+                    <div class="d-flex justify-content-end fw-bolder">
+                        <span class="me-4 my-auto text-secondary">Register</span>
+                        <a asp-page="./Login" class="me-2 btn btn-light rounded-pill w-50 fw-bolder">Login</a>
+                    </div>
+                }
+                else
+                {
+                    User LogginedUser = JsonSerializer.Deserialize<User>(HttpContext.Session.GetString("User"));
+                    <div class="dropdown menu ms-3">
+                        <button type="button" class="d-flex align-items-center" data-toggle="dropdown">
+                            <img class="avatar" src="@LogginedUser.Avatar" />
+                            <span>@LogginedUser.FullName</span>
+                            <i class="fas fa-caret-down ms-2 me-2"></i>
+                        </button>
+                        <div class="dropdown-menu mt-0 p-0">
+                            <a href="#" class="dropdown-item">Profile</a>
+                            <div class="dropdown-divider"></div>
+                            <a asp-page="./Login" asp-page-handler="Logout" class="dropdown-item">Logout</a>
+                        </div>
+                    </div>
+                }
+                <div></div>
+            </div>
+        </header>
+    </div>
+    <div id="main" class="main d-flex flex-column">
+        <div class="margin-top"></div>
+
+        <div class="main-container">
+            @if (!string.IsNullOrEmpty(HttpContext.Session.GetString("User")))
+            {
+                <h2 class="title mb-3">Recently released</h2>
+
+                <div class="row list mb-5">
+                    @foreach (var item in Model.ListHistorySongs)
+                    {
+                        <div class="col-12 col-md-3 col-lg-2">
+                            <div class="card">
+
+                                <img src="@item.Image" class="card-img-top rounded-0 mb-3" />
+
+                                <div class="card-body p-0">
+
+                                    <h5 class="card-title">@item.Title</h5>
+                                    <p class="card-text">
+                                        @foreach (var artist in item.SongArtists)
+                                        {
+                                            if (artist.ArtistId != item.SongArtists.LastOrDefault().ArtistId)
+                                            {
+                                                artist.Artist.Name += ", ";
+                                            }
+                                            @artist.Artist.Name
+                                        }
+                                    </p>
+
+                                </div>
+
+                                <div class="btn-play" id="@item.Id">
+                                    <button class="play-music-btn d-flex justify-content-center align-items-center">
+                                        <i class="fas fa-play"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                User userLogged = JsonSerializer.Deserialize<User>(HttpContext.Session.GetString("User"));
+                <h2 class="title mb-3">
+                    Song for
+                    @userLogged.FullName
+                </h2>
+
+                <div class="row list mb-5">
+                    @foreach (var item in Model.ListRecommendedSongs)
+                    {
+                        <div class="col-12 col-md-3 col-lg-2">
+                            <div class="card">
+
+                                <img src="@item.Image" class="card-img-top rounded-0 mb-3" />
+
+                                <div class="card-body p-0">
+
+                                    <h5 class="card-title">@item.Title</h5>
+                                    <p class="card-text">
+                                        @foreach (var artist in item.SongArtists)
+                                        {
+                                            if (artist.ArtistId != item.SongArtists.LastOrDefault().ArtistId)
+                                            {
+                                                artist.Artist.Name += ", ";
+                                            }
+                                            @artist.Artist.Name
+                                        }
+                                    </p>
+                                </div>
+
+                                <div class="btn-play" id="@item.Id">
+                                    <button class="play-music-btn d-flex justify-content-center align-items-center">
+                                        <i class="fas fa-play"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            <h2 class="title mb-3">Song Trending</h2>
+
+            <div class="row list mb-5">
+                @foreach (var item in Model.ListTrendingSongs)
+                {
+                    <div class="col-12 col-md-3 col-lg-2">
+                        <div class="card">
+
+                            <img src="@item.Image" class="card-img-top rouded-0 mb-3" />
+
+                            <div class="card-body p-0">
+
+                                <h5 class="card-title">@item.Title</h5>
+                                <p class="card-text">
+                                    @foreach (var artist in item.SongArtists)
+                                    {
+                                        if (artist.ArtistId != item.SongArtists.LastOrDefault().ArtistId)
+                                        {
+                                            artist.Artist.Name += ", ";
+                                        }
+                                        @artist.Artist.Name
+                                    }
+                                </p>
+
+                            </div>
+
+                            <div class="btn-play" id="@item.Id">
+                                <button class="play-music-btn d-flex justify-content-center align-items-center">
+                                    <i class="fas fa-play"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="d-flex align-items-center mb-3">
+                <div>
+                    <h2 class="title mb-1">Album</h2>
+                    <span class="subtitle">Albums recommend today.</span>
+                </div>
+            </div>
+
+            <div class="row list mb-5">
+                @foreach (var item in Model.ListRecommendedAlbums)
+                {
+                    <div class="col-12 col-md-3 col-lg-2">
+                        <div class="card">
+                            <a href="/Album?albumId=@item.Id" class="nav-link">
+                                <img src="@item.Image" class="card-img-top rounded-0 mb-3" />
+
+                                <div class="card-body p-0">
+                                    <h5 class="card-title">@item.Title</h5>
+                                    <p class="card-text">
+                                        @item.Artist.Name
+                                    </p>
+                                </div>
+                            </a>
+                            <div class="btn-play" id="@item.Id">
+                                <button class="play-music-album-btn d-flex justify-content-center align-items-center">
+                                    <i class="fas fa-play"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="d-flex align-items-center mb-3">
+                <div>
+                    <h2 class="title mb-1">Artist recommend</h2>
+                </div>
+            </div>
+
+            <div class="row list mb-5">
+                @{
+                    var count = 0;
+                }
+                @foreach (var item in Model.ListRecommendedArtists)
+                {
+                    if (count < 6)
+                    {
+                        <div class="col-12 col-md-3 col-lg-2">
+                            <div class="card">
+                                <a href="/Artist?artistId=@item.Id" class="nav-link">
+                                    <img src="@item.Image" class="card-img-top rounded-circle mb-3" />
+
+                                    <div class="card-body p-0">
+                                        <h5 class="card-title">@item.Name</h5>
+                                        <p class="card-text">Artist</p>
+                                    </div>
+                                </a>
+                                <div class="btn-play" id="@item.Id">
+                                    <button class="play-music-artist-btn d-flex justify-content-center align-items-center">
+                                        <i class="fas fa-play"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        count++;
+                    }
+                }
+            </div>
+
+        </div>
+    </div>
+    <div class="player d-flex align-items-center">
+        <footer class="w-100" id="music-container">
+            <div class="row">
+                <div class="col-3 d-flex align-items-center">
+                    <div class="cover">
+                        <img src="img/cds/music-default.jpg" id="cover" />
+                    </div>
+                    <div class="d-flex flex-column text ms-3 me-3">
+                        <label class="m-0" id="title">Song Name</label>
+                        <span id="artist">Artist</span>
+                    </div>
+
+                    @*<div class="d-flex icon justify-content-center align-items-center">
+                        <i class="far fa-heart color-default"></i>
+                    </div>
+                    <div class="d-flex icon justify-content-center align-items-center">
+                        <i class="fas fa-image color-default"></i>
+                    </div>*@
+                </div>
+
+                <div class="col-6 d-flex align-items-center justify-content-center">
+                    <div class="player-center">
+                        <div class="player-center-controls d-flex justify-content-between align-items-center">
+                            <button id="random-audio" class="icon btn btn-link d-flex justify-content-center align-items-center">
+                                <i class="fas fa-random color-default"></i>
+                            </button>
+
+                            <button id="prev" class="icon btn btn-link d-flex justify-content-center align-items-center">
+                                <i class="fas fa-angle-left color-default"></i>
+                            </button>
+
+                            <button id="play" class="play icon btn btn-link d-flex justify-content-center align-items-center">
+                                <i class="fas fa-play-circle color-default"></i>
+                            </button>
+
+                            <button id="next" class="icon btn btn-link d-flex justify-content-center align-items-center">
+                                <i class="fas fa-angle-right color-default"></i>
+                            </button>
+
+                            <button id="redo-audio" class="icon btn btn-link d-flex justify-content-center align-items-center">
+                                <i class="fas fa-redo color-default"></i>
+                            </button>
+                        </div>
+
+                        <div class="d-flex align-items-center">
+                            <div class="progress-time">
+                                <span class="color-default" id="progress-currentTime">0:00</span>
+                            </div>
+                            <div class="progress-bar" id="progress-container">
+                                <div class="progress" id="progress"></div>
+                            </div>
+                            <audio src="img/songs/test.mp3" id="audio"></audio>
+                            <div class="progress-time">
+                                <span class="color-default" id="progress-duration">0:00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-3 d-flex align-items-center justify-content-end">
+                    @*<button class="icon btn btn-link d-flex justify-content-center align-items-center">
+                        <i class="fas fa-list-ul color-default"></i>
+                    </button>
+
+                    <button class="icon btn btn-link d-flex justify-content-center align-items-center">
+                        <i class="fas fa-desktop color-default"></i>
+                    </button>*@
+
+                    <button class="icon btn btn-link d-flex justify-content-center align-items-center">
+                        <i class="fas fa-volume-up color-default"></i>
+                    </button>
+
+                    <div class="volume-bar">
+                        <div class="progress-bar" id="progress-volume">
+                            <div class="progress" id="progress-volume-bar"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+</div>
+
+<!-- Login Modal-->
+<div class="modal fade" id="LoginModal" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-info text-white rounded-4 p-3">
+            <h3>Create new playlist</h3>
+            <h6 class="fw-normal">Login to create new and share playlist</h6>
+            <div class="d-flex justify-content-end">
+                <button type="button" class="me-4 my-auto text-secondary btn btn-info fw-bolder" data-bs-dismiss="modal" aria-label="Close">Later</button>
+                <a href="/Login" class="me-2 btn btn-light rounded-pill w-25 fw-bolder">Login</a>
+            </div>
+        </div>
+    </div>
+</div>

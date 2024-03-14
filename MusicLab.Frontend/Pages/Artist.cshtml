@@ -1,0 +1,247 @@
+﻿@page
+@model MusicLab.Frontend.Pages.ArtistModel
+@{
+    Layout = "_LayoutHome";
+    ViewData["Title"] = "Artist";
+}
+<div class="margin-top"></div>
+<div class="main-container">
+    <div class="row list mb-5 position-relative">
+        <img src="@Model.Artist.CoverImage" class="img-cover rounded-top" />
+        <div class="position-absolute top-50 start-50 translate-middle" style="padding: 70px 0 0 70px;">
+            <i class="fa-solid fa-circle-check fs-4" style="color: #005eff;"></i>
+            <span class="fs-4 text-white">Artist Verify</span>
+            <h1 class="text-white fw-bold font-monospace" style="font-size:120px;">@Model.Artist.Name</h1>
+            <span class="fs-4 text-white">@string.Format("{0:0,0,0}", Model.Listens) Listens</span>
+        </div>
+    </div>
+    <div class="mb-5 d-flex">
+        <div class="btn-play-artist d-inline-flex" id="@Model.Artist.Id">
+            <button class="play-music-artist-btn d-flex justify-content-center align-items-center">
+                <i class="fas fa-play fs-4"></i>
+            </button>
+        </div>
+        @if (string.IsNullOrEmpty(HttpContext.Session.GetString("User")))
+        {
+
+            <div class="btn-follow-modal d-inline-flex ms-5">
+                <a href="#" data-bs-toggle="modal" data-bs-target="#LoginModal">
+                    <div class="d-flex justify-content-center align-items-center my-auto w-100 h-50 btn btn-outline-light rounded-pill">
+                        <span class="fw-medium">Follow</span>
+                    </div>
+                </a>
+            </div>
+
+        }
+        else
+        {
+            @if (Model.IsFollow == true)
+            {
+                <div class="btn-unfollow-artist d-inline-flex ms-5" id="@Model.Artist.Id">
+                    <button class="d-flex justify-content-center align-items-center my-auto w-100 h-50 btn btn-success rounded-pill">
+                        <span class="fw-medium">UnFollow</span>
+                    </button>
+                </div>
+            }
+            else
+            {
+                <div class="btn-follow-artist d-inline-flex ms-5" id="@Model.Artist.Id">
+                    <div class="d-flex justify-content-center align-items-center my-auto w-100 h-50 btn btn-outline-light rounded-pill">
+                        <span class="fw-medium">Follow</span>
+                    </div>
+                </div>
+            }
+        }
+
+    </div>
+    <div class="row list mb-5">
+        <div class="col-12 col-md-8 col-lg-9">
+            <h2 class="title mb-3">Popular</h2>
+            @foreach (var item in Model.Songs)
+            {
+                <div class="search-song-hover d-flex p-2" id="@item.Id">
+                    <div class="play-music-btn-artist search-btnPlay position-relative">
+                        <img src="@item.Image" class="searched-song d-inline my-auto rounded">
+                        <div class="search-btnPlay-song position-absolute top-50 start-50 translate-middle">
+                            <i class="fa-solid fa-play text-white"></i>
+                        </div>
+                    </div>
+                    <div class="d-inline-block ms-4 text-white-50">
+                        <b class="fs-5 text-white">@item.Title</b><br />
+                        <span>
+                            @foreach (var artist in item.SongArtists)
+                            {
+                                if (artist.ArtistId != item.SongArtists.LastOrDefault().ArtistId)
+                                {
+                                    artist.Artist.Name += ", ";
+                                }
+                                @artist.Artist.Name
+                            }
+                        </span>
+                    </div>
+                    <span class="search-favorite ms-auto me-5 align-content-center text-white-50" id="@Model.Artist.Id">
+                        <span style="margin-right:300px;"> @string.Format("{0:0,0,0}", @item.NumberOfListen)</span>
+                        @if (string.IsNullOrEmpty(HttpContext.Session.GetString("User")))
+                        {
+                            <a href="#" data-bs-toggle="modal" data-bs-target="#LoginModal">
+                                <i class="search-favorite-song fa-regular fa-heart me-5 text-white-50"></i>
+                            </a>
+                        }
+                        else
+                        {
+                            var isLike = 0;
+                            foreach (var favor in Model.FavoriteSongs)
+                            {
+                                if (item.Id == favor.Id)
+                                {
+                                    <i class="del-favorite-song-artist fa-solid fa-heart me-5 text-success" id="@item.Id"></i>
+                                    isLike++;
+                                    break;
+                                }
+                            }
+                            if (isLike == 0)
+                            {
+                                <i class="search-favorite-song add-favorite-song-artist fa-regular fa-heart me-5" id="@item.Id"></i>
+                            }
+                        }
+                        @Model.GetFormattedTime(item.Duration)
+                    </span>
+                </div>
+            }
+        </div>
+        @if (Model.ListAlbums?.Any() == true)
+        {
+            <div class="col-12 col-md-4 col-lg-3">
+                <h2 class="title mb-3">Album Trending</h2>
+                <div class="card">
+                    <a href="/Album?albumId=@Model.ListAlbums[0].Id" class="nav-link">
+                        <img src="@Model.ListAlbums[0].Image" class="card-img-top rounded-0 mb-3" />
+
+                        <div class="card-body p-0">
+
+                            <h5 class="card-title">@Model.ListAlbums[0].Title</h5>
+                            <p class="card-text">@Model.ListAlbums[0].Artist.Name</p>
+
+                        </div>
+                    </a>
+                    <div class="btn-play" id="@Model.ListAlbums[0].Id">
+                        <button class="play-music-album-btn d-flex justify-content-center align-items-center">
+                            <i class="fas fa-play"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    @if (Model.ListAlbums?.Any() == true)
+    {
+        <div class="row list mb-5">
+            <h2 class="title mb-3">List Album</h2>
+            @foreach (var item in Model.ListAlbums)
+            {
+                <div class="col-12 col-md-3 col-lg-2">
+                    <div class="card">
+                        <a href="/Album?albumId=@item.Id" class="nav-link">
+                            <img src="@item.Image" class="card-img-top rounded-0 mb-3" />
+
+                            <div class="card-body p-0">
+                                <h5 class="card-title">@item.Title</h5>
+                                <p class="card-text">
+                                    @item.Artist.Name
+                                </p>
+                            </div>
+                        </a>
+                        <div class="btn-play" id="@item.Id">
+                            <button class="play-music-album-btn d-flex justify-content-center align-items-center">
+                                <i class="fas fa-play"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    <div class="d-flex align-items-center mb-3">
+        <div>
+            <h2 class="title mb-1">Artist recommend</h2>
+        </div>
+    </div>
+
+    <div class="row list mb-5">
+        @{
+            var count = 0;
+        }
+        @foreach (var item in Model.ListRecommendedArtists)
+        {
+            if (count < 6 && item.Id != Model.Artist.Id)
+            {
+                <div class="col-12 col-md-3 col-lg-2">
+                    <div class="card">
+                        <a href="/Artist?artistId=@item.Id" class="nav-link">
+                            <img src="@item.Image" class="card-img-top rounded-circle mb-3" />
+
+                            <div class="card-body p-0">
+                                <h5 class="card-title">@item.Name</h5>
+                                <p class="card-text">Artist</p>
+                            </div>
+                        </a>
+                        <div class="btn-play" id="@item.Id">
+                            <button class="play-music-artist-btn d-flex justify-content-center align-items-center">
+                                <i class="fas fa-play"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                count++;
+            }
+        }
+    </div>
+
+    <div class="row list mb-5">
+        <h2 class="title mb-3">Profile</h2>
+        <div class="col-12 col-md-8 col-lg-6" data-bs-toggle="modal" data-bs-target="#ArtistModal">
+            <div class="card">
+                <img src="@Model.Artist.Image" class="card-img-artist rounded-circle mb-3" />
+                <div class="card-body p-0">
+                    <a href="#">
+                        <h5 class="card-title">@Model.Artist.Name</h5>
+                        <p class="card-text">
+                            @Model.Artist.Biography
+                        </p>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Artist Modal-->
+<div class="modal fade" id="ArtistModal" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+        <div class="modal-content bg-dark text-white-50 rounded-4 p-3">
+            <button type="button" class="btn-close btn btn-secondary rounded-circle justify-content-end" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-body">
+                <img src="@Model.Artist.Image" class="card-img-artist w-100 rounded-2 my-2" />
+                <div class="row">
+                    <div class="col-12 col-md-5 col-lg-4 p-4">
+                        <h3 class="text-white">@string.Format("{0:0,0,0}", Model.Followers)</h3>
+                        <span>Followers</span>
+                        <h3 class="text-white mt-3">@string.Format("{0:0,0,0}", Model.Listens)</h3>
+                        <span>Listens</span>
+                    </div>
+                    <div class="col-12 col-md-7 col-lg-8 p-4">
+                        <span>@Model.Artist.Biography</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(".nav-link").click(function (e) {
+        e.preventDefault();
+        var url = $(this).attr("href");
+        loadPage(url);
+    });
+</script>
